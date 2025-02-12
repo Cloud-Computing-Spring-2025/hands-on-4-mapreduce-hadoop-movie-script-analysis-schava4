@@ -11,6 +11,10 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 public class MovieScriptAnalysis {
 
     public static void main(String[] args) throws Exception {
+        if (args.length < 2) {
+            System.err.println("Usage: MovieScriptAnalysis <input path> <output path>");
+            System.exit(-1);
+        }
         Configuration conf = new Configuration();
 
         // Task 1: Most Frequent Words by Character
@@ -22,7 +26,9 @@ public class MovieScriptAnalysis {
         job1.setOutputValueClass(IntWritable.class);
         FileInputFormat.addInputPath(job1, new Path(args[1]));
         FileOutputFormat.setOutputPath(job1, new Path(args[2] + "/task1"));
-        job1.waitForCompletion(true);
+        if(!job1.waitForCompletion(true)){
+            System.exit(1);  // Exit if job1 fails
+        }
 
         // Task 2: Dialogue Length Analysis
         Job job2 = Job.getInstance(conf, "Dialogue Length Analysis");
@@ -33,7 +39,9 @@ public class MovieScriptAnalysis {
         job2.setOutputValueClass(IntWritable.class);
         FileInputFormat.addInputPath(job2, new Path(args[1]));
         FileOutputFormat.setOutputPath(job2, new Path(args[2] + "/task2"));
-        job2.waitForCompletion(true);
+        if(job2.waitForCompletion(true)){
+            System.exit(1);  // Exit if job2 fails
+        }
 
         // Task 3: Unique Words by Character
         Job job3 = Job.getInstance(conf, "Unique Words by Character");

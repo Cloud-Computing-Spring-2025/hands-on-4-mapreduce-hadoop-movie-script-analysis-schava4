@@ -14,6 +14,30 @@ public class DialogueLengthMapper extends Mapper<Object, Text, Text, IntWritable
 
     @Override
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+        String line = value.toString().trim();
+        
+        // Ignore empty lines
+        if (line.isEmpty()) {
+            return;
+        }
+
+        // Split by first occurrence of ':' to separate character and dialogue
+        int colonIndex = line.indexOf(":");
+        if (colonIndex == -1) {
+            return; // Ignore lines without a valid character name
+        }
+
+        String characterName = line.substring(0, colonIndex).trim();
+        String dialogue = line.substring(colonIndex + 1).trim();
+
+        // Count words in the dialogue
+        StringTokenizer tokenizer = new StringTokenizer(dialogue);
+        int count = tokenizer.countTokens();
+
+        // Set values and write to context
+        character.set(characterName);
+        wordCount.set(count);
+        context.write(character, wordCount);
 
     }
 }
